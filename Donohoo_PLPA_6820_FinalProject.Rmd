@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE)
 ```
 
 ### 05 Population Structure Analyses - LEA Admixture
+Genetic admixture among all lineages was assessed with the snmf function in the R package LEA (Frichot & François, 2015) using the single-snp datasets produced by STACKS because the *snmf* method assumes that SNPs are unlinked.
 
 ```{r 05_LEA_Admixture_Analysis, echo=TRUE, results = 'hide'}
 
