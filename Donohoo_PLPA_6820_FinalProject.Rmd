@@ -24,9 +24,13 @@ library(ggrepel)
 
 # Load data from Single SNP VCF produced by Stacks
 Dutt.input.file <- "05_Population_Structure_Admixture/Duttoniana_min_max_NBA_Single.snps.vcf"
+Gent.input.file <- "05_Population_Structure_Admixture/Geniculata_min_max_NBA_Single.snps.vcf"
+Ful.input.file <- "05_Population_Structure_Admixture/Fuliginosa_min_max_NBA_Single.snps.vcf"
 
 # Load in metadata for each Species
 Dutt.Metadata <- read.csv("05_Population_Structure_Admixture/Duttoniana_Metadata.csv", header = TRUE, na.strings = "NA")
+Gent.Metadata <- read.csv("05_Population_Structure_Admixture/Geniculata_Metadata.csv", header = TRUE, na.strings = "NA")
+Ful.Metadata <- read.csv("05_Population_Structure_Admixture/Fuliginosa_Metadata.csv", header = TRUE, na.strings = "NA")
 
 # Create a function that finds the best fit K-value for LEA Admixture Analysis.
 Admixture.Lea.K.qmatrix <- function(Input.File, Kvalue){
@@ -38,13 +42,17 @@ Admixture.Lea.K.qmatrix <- function(Input.File, Kvalue){
   best <- which.min(ce)
   qmatrix <- Q(obj.snmf_100, K = Kvalue, run = best)
 }
+```
 
+#### *Lithasia duttoniana*
+
+```{r 05_LEA_Admixture_Analysis L. duttoniana, echo=TRUE, results = 'hide'}
 # Run LEA Admixture for Lithasia duttoniana in the Duck River, TN.
 # Best fit K-value is 2.
 Dutt.qmatrix.K2 <- Admixture.Lea.K.qmatrix(Dutt.input.file, 2)
 ```
 
-```{r 05_LEA_Admixture_Analysis Part 2, echo=TRUE}
+```{r 05_LEA_Admixture_Analysis L. duttoniana P2, echo=TRUE}
 # Convert Vector into DataFrame
 Dutt.qmatrix.K2 <- data.frame(Dutt.qmatrix.K2)
 
@@ -107,7 +115,157 @@ Dutt.admixture <- ggplot(Dutt.LEA.K2.Long, aes(x = factor(Specimen), y = Amount,
 
 #### Results of LEA Admixture Analysis for *Lithasia duttoniana*
 
-```{r 05_LEA_Admixture_Analysis Part 3, echo=FALSE}
+```{r 05_LEA_Admixture_Analysis L. duttoniana P3, echo=FALSE}
 # View Admixture Graph
 Dutt.admixture
+```
+
+#### *Lithasia fuliginosa*
+
+```{r 05_LEA_Admixture_Analysis L. fuliginosa, echo=TRUE, results = 'hide'}
+# Run LEA Admixture for Lithasia fuliginosa in the Duck River, TN.
+# Best fit K-value is 2.
+Ful.qmatrix.K2 <- Admixture.Lea.K.qmatrix(Ful.input.file, 2)
+```
+
+```{r 05_LEA_Admixture_Analysis L. fuliginosa P2, echo=TRUE}
+# Convert Vector into DataFrame
+Ful.qmatrix.K2 <- data.frame(Ful.qmatrix.K2)
+
+# Add Specimen Column from Metadata to Qmatrix for Future Joining
+Ful.qmatrix.K2$Specimen <- Ful.Metadata$Specimen
+
+# Combine with Metadata DataFrame
+Ful.LEA.K2.Join <- full_join(Ful.Metadata, Ful.qmatrix.K2, by = "Specimen")
+
+# Convert from Wide to Long Format
+Ful.LEA.K2.Long <- Ful.LEA.K2.Join %>% 
+  pivot_longer(
+    cols = `V1`:`V6`, 
+    names_to = "Admixure",
+    values_to = "Amount"
+  )
+
+# Convert the Column Site into a Factor to Allow for Faceting
+Ful.LEA.K2.Long$Site <- as.factor(Ful.LEA.K2.Long$Site)
+
+# Using Levels, Reorder Sites so They Run Downstream to UpStream
+Ful.LEA.K2.Long$Site <- factor(Ful.LEA.K2.Long$Site, levels = c("Dyer",
+                                                                    "LL",
+                                                                    "F",
+                                                                    "SP",
+                                                                    "FW",
+                                                                    "SM",
+                                                                    "CB",
+                                                                    "HDM",
+                                                                    "LM",
+                                                                    "HWY31",
+                                                                    "HM",
+                                                                    "WB",
+                                                                    "SR",
+                                                                    "HWY231",
+                                                                    "HWY41A",
+                                                                    "TF",
+                                                                    "HWY269",
+                                                                    "PB"
+))
+
+# Create a Color-Blind Friendly Palette
+cbbPalette <- c("#56B4E9","#E69F00", "#0072B2", "#009E73", "#F0E442", "#CC79A7", "#D55E00")
+
+# Graph the Admixture Results. Use Facet to Split into Sections by Site
+Ful.admixture <- ggplot(Ful.LEA.K2.Long, aes(x = factor(Specimen), y = Amount, fill = Admixure)) +
+  geom_col(width = 1) +
+  # Facet over the groups
+  facet_grid(~ Site, switch = "x", scales = "free", space = "free") +
+  # Use these expand arguments to get rid of padding around the axes
+  scale_x_discrete(expand = c(0,0), name = "Lithasia Fuloniana Sites") +
+  scale_y_continuous(expand = c(0,0), name = "Admixture Coefficients") +
+  scale_fill_manual(values = (cbbPalette), name = "") +
+  # We're hiding most of the x-axis and the spacing between panels
+  theme(panel.spacing.x = grid::unit(0.05, "cm"),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.background = element_blank(),
+        panel.border = element_rect(fill = NA, colour = "black"),
+        legend.position="")
+```
+
+#### Results of LEA Admixture Analysis for *Lithasia fuliginosa*
+
+```{r 05_LEA_Admixture_Analysis Part 3, echo=FALSE}
+# View Admixture Graph
+Ful.admixture
+```
+
+#### *Lithasia geniculata*
+
+```{r 05_LEA_Admixture_Analysis L. geniculata, echo=TRUE, results = 'hide'}
+# Run LEA Admixture for Lithasia fuliginosa in the Duck River, TN.
+# Best fit K-value is 2.
+Gent.qmatrix.K2 <- Admixture.Lea.K.qmatrix(Gent.input.file, 2)
+```
+
+```{r 05_LEA_Admixture_Analysis L. geniculata P2, echo=TRUE}
+# Convert Vector into DataFrame
+Gent.qmatrix.K2 <- data.frame(Gent.qmatrix.K2)
+
+# Add Specimen Column from Metadata to Qmatrix for Future Joining
+Gent.qmatrix.K2$Specimen <- Gent.Metadata$Specimen
+
+# Combine with Metadata DataFrame
+Gent.LEA.K2.Join <- Gentl_join(Gent.Metadata, Gent.qmatrix.K2, by = "Specimen")
+
+# Convert from Wide to Long Format
+Gent.LEA.K2.Long <- Gent.LEA.K2.Join %>% 
+  pivot_longer(
+    cols = `V1`:`V6`, 
+    names_to = "Admixure",
+    values_to = "Amount"
+  )
+
+# Convert the Column Site into a Factor to Allow for Faceting
+Gent.LEA.K2.Long$Site <- as.factor(Gent.LEA.K2.Long$Site)
+
+# Using Levels, Reorder Sites so They Run Downstream to UpStream
+Gent.LEA.K2.Long$Site <- factor(Gent.LEA.K2.Long$Site, levels = c("Dyer",
+                                                                      "NV",
+                                                                      "CV",
+                                                                      "TB",
+                                                                      "LL",
+                                                                      "BL",
+                                                                      "KM",
+                                                                      "FM",
+                                                                      "B",
+                                                                      "CS",
+                                                                      "IP",
+                                                                      "R"
+))
+
+# Create a Color-Blind Friendly Palette
+cbbPalette <- c("#56B4E9","#E69F00", "#0072B2", "#009E73", "#F0E442", "#CC79A7", "#D55E00")
+
+# Graph the Admixture Results. Use Facet to Split into Sections by Site
+Gent.admixture <- ggplot(Gent.LEA.K2.Long, aes(x = factor(Specimen), y = Amount, fill = Admixure)) +
+  geom_col(width = 1) +
+  # Facet over the groups
+  facet_grid(~ Site, switch = "x", scales = "free", space = "free") +
+  # Use these expand arguments to get rid of padding around the axes
+  scale_x_discrete(expand = c(0,0), name = "Lithasia Gentoniana Sites") +
+  scale_y_continuous(expand = c(0,0), name = "Admixture Coefficients") +
+  scale_fill_manual(values = (cbbPalette), name = "") +
+  # We're hiding most of the x-axis and the spacing between panels
+  theme(panel.spacing.x = grid::unit(0.05, "cm"),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.background = element_blank(),
+        panel.border = element_rect(fill = NA, colour = "black"),
+        legend.position="")
+```
+
+#### Results of LEA Admixture Analysis for *Lithasia fuliginosa*
+
+```{r 05_LEA_Admixture_Analysis Part 3, echo=FALSE}
+# View Admixture Graph
+Ful.admixture
 ```
