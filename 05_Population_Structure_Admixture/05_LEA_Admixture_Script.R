@@ -17,15 +17,6 @@ Gent.Metadata <- read.csv("Final_Project_DuckRiver_PopulationGenetics/05_Populat
 Ful.Metadata <- read.csv("Final_Project_DuckRiver_PopulationGenetics/05_Population_Structure_Admixture/Fuliginosa_Metadata.csv", header = TRUE, na.strings = "NA")
 
 # Create a function that finds the best fit K-value for LEA Admixture Analysis.
-Admixture.Lea.K.Find <- function(Input.File){
-  Geno <- vcf2geno(Input.File, force = TRUE)
-  obj.snmf_100 = snmf(Geno, K = 1:10, project = "new", alpha = 100, 
-                      tolerance = 0.0000000001, repetitions = 10, 
-                      entropy=TRUE, ploidy = 2)
-  plot(obj.snmf_100, cex = 1.2, col = "blue", pch = 19)
-}
-
-# Create a function that generates the corresponding best-fit K-value qmatrix for graphing.
 Admixture.Lea.K.qmatrix <- function(Input.File, Kvalue){
   Geno <- vcf2geno(Input.File, force = TRUE)
   obj.snmf_100 = snmf(Geno, K = Kvalue, project = "new", alpha = 100, 
@@ -39,56 +30,58 @@ Admixture.Lea.K.qmatrix <- function(Input.File, Kvalue){
 ##### LEA ADMIXTURE FOR LITHASIA DUTTONIANA #####
 
 # Run LEA Admixture for Lithasia duttoniana in the Duck River, TN.
-Dutt.find.Kvalue <- Admixture.Lea.K.Find(Dutt.input.file)
-
 # Best fit K-value is 2.
 Dutt.qmatrix.K2 <- Admixture.Lea.K.qmatrix(Dutt.input.file, 2)
 
-# Convert Vector into DataFrame and Append to Metadata DataFrame
+# Convert Vector into DataFrame
 Dutt.qmatrix.K2 <- data.frame(Dutt.qmatrix.K2)
-Dutt.Metadata$A <- Dutt.qmatrix.K2$V1
-Dutt.Metadata$B <- Dutt.qmatrix.K2$V2
+
+# Add Specimen Column from Metadata to Qmatrix for Future Joining
+Dutt.qmatrix.K2$Specimen <- Dutt.Metadata$Specimen
+
+# Combine with Metadata DataFrame
+Dutt.LEA.K2.Join <- full_join(Dutt.Metadata, Dutt.qmatrix.K2, by = "Specimen")
 
 # Convert from Wide to Long Format
-Dutt.Metadata.Long <- Dutt.Metadata %>% 
+Dutt.LEA.K2.Long <- Dutt.LEA.K2.Join %>% 
   pivot_longer(
-    cols = `A`:`B`, 
+    cols = `V1`:`V2`, 
     names_to = "Admixure",
     values_to = "Amount"
   )
 
 # Convert the Column Site into a Factor to Allow for Faceting
-Dutt.Metadata.Long$Site <- as.factor(Dutt.Metadata.Long$Site)
+Dutt.LEA.K2.Long$Site <- as.factor(Dutt.LEA.K2.Long$Site)
 
 # Using Levels, Reorder Sites so They Run Downstream to UpStream
-Dutt.Metadata.Long$Site <- factor(Dutt.Metadata.Long$Site, levels = c("Dyer",
-                                                                      "NV",
-                                                                      "CV",
-                                                                      "KM",
-                                                                      "B",
-                                                                      "IP",
-                                                                      "HWY412",
-                                                                      "R",
-                                                                      "IB",
-                                                                      "SP",
-                                                                      "FW",
-                                                                      "SM",
-                                                                      "CB",
-                                                                      "HM",
-                                                                      "HWY31",
-                                                                      "WB"
+Dutt.LEA.K2.Long$Site <- factor(Dutt.LEA.K2.Long$Site, levels = c("Dyer",
+                                                                  "NV",
+                                                                  "CV",
+                                                                  "KM",
+                                                                  "B",
+                                                                  "IP",
+                                                                  "HWY412",
+                                                                  "R",
+                                                                  "IB",
+                                                                  "SP",
+                                                                  "FW",
+                                                                  "SM",
+                                                                  "CB",
+                                                                  "HM",
+                                                                  "HWY31",
+                                                                  "WB"
 ))
 
 # Create a Color-Blind Friendly Palette
 cbbPalette <- c("#56B4E9","#E69F00", "#0072B2", "#009E73", "#F0E442", "#D55E00", "#CC79A7")
 
 # Graph the Admixture Results. Use Facet to Split into Sections by Site
-Dutt.admixture <- ggplot(Dutt.Metadata.Long, aes(x = factor(Specimen), y = Amount, fill = Admixure)) +
+Dutt.admixture <- ggplot(Dutt.LEA.K2.Long, aes(x = factor(Specimen), y = Amount, fill = Admixure)) +
   geom_col(width = 1) +
   # Facet over the groups
   facet_grid(~ Site, switch = "x", scales = "free", space = "free") +
   # Use these expand arguments to get rid of padding around the axes
-  scale_x_discrete(expand = c(0,0), name = "Site") +
+  scale_x_discrete(expand = c(0,0), name = "Lithasia duttoniana Sites") +
   scale_y_continuous(expand = c(0,0), name = "Admixture Coefficients") +
   scale_fill_manual(values = (cbbPalette), name = "") +
   # We're hiding most of the x-axis and the spacing between panels
