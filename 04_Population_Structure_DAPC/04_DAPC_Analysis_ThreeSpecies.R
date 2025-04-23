@@ -29,33 +29,15 @@ scatter(dapc2, solid=0.4, cex=3,
         bg="white",pch=20, cstar=0, col=cbbPalette,
         label.inds = TRUE)
 
-
-# Admix Plot Subset
-
-compoplot(dapc2, col=cbbPalette, show.lab = TRUE, posi="top",
-          cex.names=0.8)
-
-# Admix Plot Small Font All Samples
-
+# Assignment Plot Small Font All Samples
 compoplot(dapc2, col=cbbPalette, show.lab = TRUE, posi="top",
           cex.names=0.5)
 
-# Admix Plot No Individual Names
-
-compoplot(dapc2, col=cbbPalette, show.lab = TRUE)
-
-compoplot(dapc2, col=cbbPalette)
-
-# Mountain Plot Thing
-
+# Mountain Plot
 scatter(dapc2,1,1, col=cbbPalette, bg="white", scree.da=FALSE, legend=TRUE, solid=.4)
 
 # Cluster ID Using Subsets
-
 assignplot(dapc2)
 
-assignplot(dapc2, subset = 201:250)
-
+# Write Qmatrix to CSV
 write.csv(grp[["grp"]], "04_Population_Structure_DAPC/DuckRiver_DAPC_k7.csv")
-
-dev.off()

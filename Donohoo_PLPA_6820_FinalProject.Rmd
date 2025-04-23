@@ -93,13 +93,6 @@ cbbPalette <- c("#56B4E9","#E69F00", "#0072B2", "#009E73", "#F0E442", "#D55E00",
 # Initial Scatterplot with Cluster Assignments
 scatter(dapc2, scree.da=FALSE, bg="white", pch=20, cell=0,
         cstar=0, col=cbbPalette, solid=.4, cex=3,clab=0, leg=TRUE, posi.leg = "bottomright")
-
-# Final Scatterplot with Cluster Assignments, and DA / PCA Eigenvalues
-scatter(dapc2, solid=0.4, cex=3, 
-        ratio.da = 0.2,
-        posi.pca = "topleft", scree.pca = TRUE, ratio.pca=0.3,
-        bg="white",pch=20, cstar=0, col=cbbPalette,
-        label.inds = TRUE)
 ```
 
 ### 05 Population Structure Analyses - LEA Admixture
@@ -234,7 +227,7 @@ Ful.LEA.K4.Join <- full_join(Ful.Metadata, Ful.qmatrix.K4, by = "Specimen")
 # Convert from Wide to Long Format
 Ful.LEA.K4.Long <- Ful.LEA.K4.Join %>% 
   pivot_longer(
-    cols = `V1`:`V5`, 
+    cols = `V1`:`V4`, 
     names_to = "Admixure",
     values_to = "Amount"
   )
@@ -310,7 +303,7 @@ Gent.LEA.K2.Join <- full_join(Gent.Metadata, Gent.qmatrix.K2, by = "Specimen")
 # Convert from Wide to Long Format
 Gent.LEA.K2.Long <- Gent.LEA.K2.Join %>% 
   pivot_longer(
-    cols = `V1`:`V3`, 
+    cols = `V1`:`V2`, 
     names_to = "Admixure",
     values_to = "Amount"
   )
@@ -377,39 +370,46 @@ plotsFolder <- "06_Genetic_CoAncestry/RADpainter_R_Plots/"
 Dut.chunkfile<-"06_Genetic_CoAncestry/Duttoniana_min_max_1pop_Multi.haps_chunks.out" ## RADpainter output file
 Dut.mcmcfile<-"06_Genetic_CoAncestry/Duttoniana_min_max_1pop_Multi.haps_chunks.mcmc.xml" ## finestructure mcmc file
 Dut.treefile<-"06_Genetic_CoAncestry/Duttoniana_min_max_1pop_Multi.haps_chunks.mcmcTree.xml" ## finestructure tree file
-Dut.analysisName <- "Duttoniana_Genetic_CoAncestry";  maxIndv <- 1000; maxPop<-1000
+Dut.analysisName <- "Lithasia_duttoniana_Genetic_CoAncestry";  maxIndv <- 1000; maxPop<-1000
 
 #### Lithasia fuliginosa
-Ful.chunkfile<-"06_Genetic_CoAncestry/Duttoniana_min_max_1pop_Multi.haps_chunks.out" ## RADpainter output file
-Ful.mcmcfile<-"06_Genetic_CoAncestry/Duttoniana_min_max_1pop_Multi.haps_chunks.mcmc.xml" ## finestructure mcmc file
-Ful.treefile<-"06_Genetic_CoAncestry/Duttoniana_min_max_1pop_Multi.haps_chunks.mcmcTree.xml" ## finestructure tree file
-Ful.analysisName <- "Duttoniana_Genetic_CoAncestry";  maxIndv <- 1000; maxPop<-1000
+Ful.chunkfile<-"06_Genetic_CoAncestry/Fuliginosa_min_max_DAPC_4pops_Multi.haps_chunks.out" ## RADpainter output file
+Ful.mcmcfile<-"06_Genetic_CoAncestry/Fuliginosa_min_max_DAPC_4pops_Multi.haps_chunks.mcmc.xml" ## finestructure mcmc file
+Ful.treefile<-"06_Genetic_CoAncestry/Fuliginosa_min_max_DAPC_4pops_Multi.haps_chunks.mcmcTree.xml" ## finestructure tree file
+Ful.analysisName <- "Lithasia_fuliginosa_Genetic_CoAncestry";  maxIndv <- 1000; maxPop<-1000
 
 #### Lithasia geniculata
-Gent.chunkfile<-"06_Genetic_CoAncestry/Duttoniana_min_max_1pop_Multi.haps_chunks.out" ## RADpainter output file
-Gent.mcmcfile<-"06_Genetic_CoAncestry/Duttoniana_min_max_1pop_Multi.haps_chunks.mcmc.xml" ## finestructure mcmc file
-Gent.treefile<-"06_Genetic_CoAncestry/Duttoniana_min_max_1pop_Multi.haps_chunks.mcmcTree.xml" ## finestructure tree file
-Gent.analysisName <- "Duttoniana_Genetic_CoAncestry";  maxIndv <- 1000; maxPop<-1000
+Gent.chunkfile<-"06_Genetic_CoAncestry/Geniculata_min_max_NBA_2pop_Multi.haps_chunks.out" ## RADpainter output file
+Gent.mcmcfile<-"06_Genetic_CoAncestry/Geniculata_min_max_NBA_2pop_Multi.haps_chunks.mcmc.xml" ## finestructure mcmc file
+Gent.treefile<-"06_Genetic_CoAncestry/Geniculata_min_max_NBA_2pop_Multi.haps_chunks.mcmcTree.xml" ## finestructure tree file
+Gent.analysisName <- "Lithasia_geniculata_Genetic_CoAncestry";  maxIndv <- 1000; maxPop<-1000
+```
 
+```{r 06_Genetic_Coancestry_Analysis P2, echo=TRUE}
 ### Create a function to visualize fineRADstructure outputs.
 fineRADstructure <- function(chunkfile,mcmcfile,treefile,analysisName){
 ### 4) EXECUTE THE CODE ABOVE AND THE REST OF THE CODE BELOW
 ## make some colours
 some.colors<-MakeColorYRP() # these are yellow-red-purple
 some.colorsEnd<-MakeColorYRP(final=c(0.2,0.2,0.2)) # as above, but with a dark grey final for capped values
+
 ###### READ IN THE CHUNKCOUNT FILE
 dataraw<-as.matrix(read.table(chunkfile,row.names=1,header=T,skip=1)) # read in the pairwise coincidence 
+
 ###### READ IN THE MCMC FILES
 mcmcxml<-xmlTreeParse(mcmcfile) ## read into xml format
 mcmcdata<-as.data.frame.myres(mcmcxml) ## convert this into a data frame
+
 ###### READ IN THE TREE FILES
 treexml<-xmlTreeParse(treefile) ## read the tree as xml format
 ttree<-extractTree(treexml) ## extract the tree into ape's phylo format
 
 ## Reduce the amount of significant digits printed in the posteror assignment probabilities (numbers shown in the tree):
 ttree$node.label[ttree$node.label!=""] <-format(as.numeric(ttree$node.label[ttree$node.label!=""]),digits=2)
+
 # convert to dendrogram format
 tdend<-myapetodend(ttree,factor=1)
+
 ## Now we work on the MAP state
 mapstate<-extractValue(treexml,"Pop") # map state as a finestructure clustering
 mapstatelist<-popAsList(mapstate) # .. and as a list of individuals in populations
@@ -437,11 +437,11 @@ dev.off()
 }
 ```
 
-```{r 06_Genetic_CoAncestry Part 2, echo=TRUE}
+```{r 06_Genetic_CoAncestry P3, echo=TRUE}
 # Run fineRADstructure function to visualize outputs
 Dutt.fine <- fineRADstructure(Dut.chunkfile,Dut.mcmcfile,Dut.treefile,Dut.analysisName)
 Ful.fine <- fineRADstructure(Ful.chunkfile,Ful.mcmcfile,Ful.treefile,Ful.analysisName)
-Ful.fine <- fineRADstructure(Gent.chunkfile,Gent.mcmcfile,Gent.treefile,Gent.analysisName)
+Gent.fine <- fineRADstructure(Gent.chunkfile,Gent.mcmcfile,Gent.treefile,Gent.analysisName)
 
 # Check for PDF files in Folder
 list.files("06_Genetic_CoAncestry/RADpainter_R_Plots/")
