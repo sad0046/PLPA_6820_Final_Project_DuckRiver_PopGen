@@ -7,14 +7,14 @@ library(ggpubr)
 library(ggrepel)
 
 # Load data from Single SNP VCF produced by Stacks
-Dutt.input.file <- "Final_Project_PopulationGenetics/05_Population_Structure_Admixture/Duttoniana_min_max_NBA_Single.snps.vcf"
-Gent.input.file <- "Final_Project_PopulationGenetics/05_Population_Structure_Admixture/Geniculata_min_max_NBA_Single.snps.vcf"
-Ful.input.file <- "Final_Project_PopulationGenetics/05_Population_Structure_Admixture/Fuliginosa_min_max_NBA_Single.snps.vcf"
+Dutt.input.file <- "05_Population_Structure_Admixture/Duttoniana_min_max_NBA_Single.snps.vcf"
+Gent.input.file <- "05_Population_Structure_Admixture/Geniculata_min_max_2Pops_NBA_Single.snps.vcf"
+Ful.input.file <- "05_Population_Structure_Admixture/Fulignosa_min_max_NBA_Updated_Single.snps.vcf"
 
 # Load in metadata for each Species
-Dutt.Metadata <- read.csv("Final_Project_DuckRiver_PopulationGenetics/05_Population_Structure_Admixture/Duttoniana_Metadata.csv", header = TRUE, na.strings = "NA")
-Gent.Metadata <- read.csv("Final_Project_DuckRiver_PopulationGenetics/05_Population_Structure_Admixture/Geniculata_Metadata.csv", header = TRUE, na.strings = "NA")
-Ful.Metadata <- read.csv("Final_Project_DuckRiver_PopulationGenetics/05_Population_Structure_Admixture/Fuliginosa_Metadata.csv", header = TRUE, na.strings = "NA")
+Dutt.Metadata <- read.csv("05_Population_Structure_Admixture/Duttoniana_Metadata.csv", header = TRUE, na.strings = "NA")
+Gent.Metadata <- read.csv("05_Population_Structure_Admixture/Geniculata_Metadata.csv", header = TRUE, na.strings = "NA")
+Ful.Metadata <- read.csv("05_Population_Structure_Admixture/Fuliginosa_Metadata.csv", header = TRUE, na.strings = "NA")
 
 # Create a function that finds the best fit K-value for LEA Admixture Analysis.
 Admixture.Lea.K.qmatrix <- function(Input.File, Kvalue){
@@ -26,6 +26,14 @@ Admixture.Lea.K.qmatrix <- function(Input.File, Kvalue){
   best <- which.min(ce)
   qmatrix <- Q(obj.snmf_100, K = Kvalue, run = best)
 }
+
+Gent <- vcf2geno(Gent.input.file, output.file = "Gent_singlesnp_LEA.geno", force = TRUE)
+Ful <- vcf2geno(Ful.input.file, output.file = "Ful_singlesnp_LEA.geno", force = TRUE)
+obj.snmf = snmf(Gent, alpha = 100, K = 1:10, project = "new",repetitions = 10, tolerance = 0.0000000001, entropy=TRUE, ploidy = 2)
+obj.snmf = snmf(Ful, alpha = 100, K = 1:10, project = "new",repetitions = 10, tolerance = 0.0000000001, entropy=TRUE, ploidy = 2)
+
+# Plot the Cross Entropy score for each # of Ancestral Populations.
+plot(obj.snmf, cex = 1.2, col = "blue", pch = 19)
 
 ##### LEA ADMIXTURE FOR LITHASIA DUTTONIANA #####
 
