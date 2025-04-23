@@ -1,4 +1,4 @@
-*.gen filter=lfs diff=lfs merge=lfs -text
 *.vcf filter=lfs diff=lfs merge=lfs -text
+*.gen filter=lfs diff=lfs merge=lfs -text
 *.xml filter=lfs diff=lfs merge=lfs -text
 *.geno filter=lfs diff=lfs merge=lfs -text
