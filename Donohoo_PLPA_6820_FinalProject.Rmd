@@ -23,10 +23,45 @@ For each lineage, observed heterozygosity (Ho), expected heterozygosity (He), nu
 ```
 
 ### 03 Population Structure Analyses - AMOVA
-An analysis of molecular variance (AMOVA; Excoffier et al., 1992) was conducted using the multiple SNPs per locus dataset for each lineage to test for population structure among collection sites. Using the poppr.amova function in the R package ADEGENET (Jombart, 2008; Kamvar et al., 2014), individuals were stratified by collection site. Significance was tested with a 999-permutation randomized test.
+An analysis of molecular variance (AMOVA; Excoffier et al., 1992) was conducted using the multiple SNPs per locus dataset for *Lithasia fuliginosa* and *Lithasia geniculata* to test for population structure among collection sites. Using the poppr.amova function in the R package ADEGENET (Jombart, 2008; Kamvar et al., 2014), individuals were stratified by collection site.
 
-```{r}
+```{r 03_AMOVA_Analysis, echo=TRUE}
+# Load packages
+library(poppr)
 
+# Load Data from Multiple HAPS Genepop File produced by Stacks
+Ful.geneid = read.genepop("03_Population_Structure_AMOVA/Fuliginosa_min_max_DAPC_4pops_Multi.haps.gen")
+Gent.geneid = read.genepop("03_Population_Structure_AMOVA/Geniculata_min_max_NBA_2pop_Multi.haps.gen")
+
+# Create a function that conducts an AMOVA using Poppr
+Amova.Poppr <- function(geneid){
+
+# Create Strata from Population Information in Geneid
+genclone<-as.genclone(geneid)
+genclone$strata
+strata(genclone)<-(as.data.frame(geneid$pop))
+
+# Run an AMOVA
+genclone
+genclone$strata
+amova.pop = poppr.amova(genclone, ~geneid.pop, cutoff = 0.5, method = "ade4")
+}
+```
+
+### 03 Population Structure Analysis - AMOVA - *Lithasia fuliginosa*
+```{r 03_AMOVA_Analysis_L_fuliginosa, echo=TRUE}
+# Lithasia geniculata AMOVA
+Ful.amova <- Amova.Poppr(Ful.geneid)
+# View AMOVA Results
+Ful.amova
+```
+
+### 03 Population Structure Analysis - AMOVA - *Lithasia geniculata*
+```{r 03_AMOVA_Analysis_L_geniculata, echo=TRUE}
+# Lithasia geniculata AMOVA
+Gent.amova <- Amova.Poppr(Gent.geneid)
+# View AMOVA Results
+Gent.amova
 ```
 
 ### 04 Population Structure Analyses - DAPC
@@ -83,11 +118,11 @@ library(ggrepel)
 # Load data from Single SNP VCF produced by Stacks
 Dutt.input.file <- "05_Population_Structure_Admixture/Duttoniana_min_max_NBA_Single.snps.vcf"
 Gent.input.file <- "05_Population_Structure_Admixture/Geniculata_min_max_2Pops_NBA_Single.snps.vcf"
-Ful.input.file <- "05_Population_Structure_Admixture/Fulignosa_min_max_NBA_Updated_Single.snps.vcf"
+Ful.input.file <- "05_Population_Structure_Admixture/Fuliginosa_min_max_DAPC_4pops_Single.snps.vcf"
 
 # Load in metadata for each Species
 Dutt.Metadata <- read.csv("05_Population_Structure_Admixture/Duttoniana_Metadata.csv", header = TRUE, na.strings = "NA")
-Gent.Metadata <- read.csv("05_Population_Structure_Admixture/Geniculata_Metadata2.csv", header = TRUE, na.strings = "NA")
+Gent.Metadata <- read.csv("05_Population_Structure_Admixture/Geniculata_Metadata.csv", header = TRUE, na.strings = "NA")
 Ful.Metadata <- read.csv("05_Population_Structure_Admixture/Fuliginosa_Metadata.csv", header = TRUE, na.strings = "NA")
 
 # Create a function that finds the best fit K-value for LEA Admixture Analysis.
@@ -183,21 +218,21 @@ Dutt.admixture
 ```{r 05_LEA_Admixture_Analysis L. fuliginosa, echo=TRUE, results = 'hide'}
 # Run LEA Admixture for Lithasia fuliginosa in the Duck River, TN.
 # Best fit K-value is 2.
-Ful.qmatrix.K5 <- Admixture.Lea.K.qmatrix(Ful.input.file, 5)
+Ful.qmatrix.K4 <- Admixture.Lea.K.qmatrix(Ful.input.file, 4)
 ```
 
 ```{r 05_LEA_Admixture_Analysis L. fuliginosa P2, echo=TRUE}
 # Convert Vector into DataFrame
-Ful.qmatrix.K5 <- data.frame(Ful.qmatrix.K5)
+Ful.qmatrix.K4 <- data.frame(Ful.qmatrix.K4)
 
 # Add Specimen Column from Metadata to Qmatrix for Future Joining
-Ful.qmatrix.K5$Specimen <- Ful.Metadata$Specimen
+Ful.qmatrix.K4$Specimen <- Ful.Metadata$Specimen
 
 # Combine with Metadata DataFrame
-Ful.LEA.K5.Join <- full_join(Ful.Metadata, Ful.qmatrix.K5, by = "Specimen")
+Ful.LEA.K4.Join <- full_join(Ful.Metadata, Ful.qmatrix.K4, by = "Specimen")
 
 # Convert from Wide to Long Format
-Ful.LEA.K5.Long <- Ful.LEA.K5.Join %>% 
+Ful.LEA.K4.Long <- Ful.LEA.K4.Join %>% 
   pivot_longer(
     cols = `V1`:`V5`, 
     names_to = "Admixure",
@@ -205,10 +240,10 @@ Ful.LEA.K5.Long <- Ful.LEA.K5.Join %>%
   )
 
 # Convert the Column Site into a Factor to Allow for Faceting
-Ful.LEA.K5.Long$Site <- as.factor(Ful.LEA.K5.Long$Site)
+Ful.LEA.K4.Long$Site <- as.factor(Ful.LEA.K4.Long$Site)
 
 # Using Levels, Reorder Sites so They Run Downstream to UpStream
-Ful.LEA.K5.Long$Site <- factor(Ful.LEA.K5.Long$Site, levels = c("D",
+Ful.LEA.K4.Long$Site <- factor(Ful.LEA.K4.Long$Site, levels = c("D",
                                                                     "SP",
                                                                     "FW",
                                                                     "SM",
@@ -230,7 +265,7 @@ Ful.LEA.K5.Long$Site <- factor(Ful.LEA.K5.Long$Site, levels = c("D",
 cbbPalette <- c("#56B4E9","#E69F00", "#009E73", "#F0E442", "#CC79A7", "#0072B2", "#D55E00")
 
 # Graph the Admixture Results. Use Facet to Split into Sections by Site
-Ful.admixture <- ggplot(Ful.LEA.K5.Long, aes(x = factor(Specimen), y = Amount, fill = Admixure)) +
+Ful.admixture <- ggplot(Ful.LEA.K4.Long, aes(x = factor(Specimen), y = Amount, fill = Admixure)) +
   geom_col(width = 1) +
   # Facet over the groups
   facet_grid(~ Site, switch = "x", scales = "free", space = "free") +
@@ -259,21 +294,21 @@ Ful.admixture
 ```{r 05_LEA_Admixture_Analysis L. geniculata, echo=TRUE, results = 'hide'}
 # Run LEA Admixture for Lithasia fuliginosa in the Duck River, TN.
 # Best fit K-value is 3.
-Gent.qmatrix.K3 <- Admixture.Lea.K.qmatrix(Gent.input.file, 3)
+Gent.qmatrix.K2 <- Admixture.Lea.K.qmatrix(Gent.input.file, 2)
 ```
 
 ```{r 05_LEA_Admixture_Analysis L. geniculata P2, echo=TRUE}
 # Convert Vector into DataFrame
-Gent.qmatrix.K3 <- data.frame(Gent.qmatrix.K3)
+Gent.qmatrix.K2 <- data.frame(Gent.qmatrix.K2)
 
 # Add Specimen Column from Metadata to Qmatrix for Future Joining
-Gent.qmatrix.K3$Specimen <- Gent.Metadata$Specimen
+Gent.qmatrix.K2$Specimen <- Gent.Metadata$Specimen
 
 # Combine with Metadata DataFrame
-Gent.LEA.K3.Join <- full_join(Gent.Metadata, Gent.qmatrix.K3, by = "Specimen")
+Gent.LEA.K2.Join <- full_join(Gent.Metadata, Gent.qmatrix.K2, by = "Specimen")
 
 # Convert from Wide to Long Format
-Gent.LEA.K3.Long <- Gent.LEA.K3.Join %>% 
+Gent.LEA.K2.Long <- Gent.LEA.K2.Join %>% 
   pivot_longer(
     cols = `V1`:`V3`, 
     names_to = "Admixure",
@@ -281,10 +316,10 @@ Gent.LEA.K3.Long <- Gent.LEA.K3.Join %>%
   )
 
 # Convert the Column Site into a Factor to Allow for Faceting
-Gent.LEA.K3.Long$Site <- as.factor(Gent.LEA.K3.Long$Site)
+Gent.LEA.K2.Long$Site <- as.factor(Gent.LEA.K2.Long$Site)
 
 # Using Levels, Reorder Sites so They Run Downstream to UpStream
-Gent.LEA.K3.Long$Site <- factor(Gent.LEA.K3.Long$Site, levels = c("Dyer",
+Gent.LEA.K2.Long$Site <- factor(Gent.LEA.K2.Long$Site, levels = c("Dyer",
                                                                       "NV",
                                                                       "CV",
                                                                       "TB",
@@ -302,7 +337,7 @@ Gent.LEA.K3.Long$Site <- factor(Gent.LEA.K3.Long$Site, levels = c("Dyer",
 cbbPalette <- c("#56B4E9","#E69F00", "#CC79A7", "#0072B2", "#009E73", "#F0E442", "#D55E00")
 
 # Graph the Admixture Results. Use Facet to Split into Sections by Site
-Gent.admixture <- ggplot(Gent.LEA.K3.Long, aes(x = factor(Specimen), y = Amount, fill = Admixure)) +
+Gent.admixture <- ggplot(Gent.LEA.K2.Long, aes(x = factor(Specimen), y = Amount, fill = Admixure)) +
   geom_col(width = 1) +
   # Facet over the groups
   facet_grid(~ Site, switch = "x", scales = "free", space = "free") +
@@ -325,8 +360,9 @@ Gent.admixture <- ggplot(Gent.LEA.K3.Long, aes(x = factor(Specimen), y = Amount,
 # View Admixture Graph
 Gent.admixture
 ```
-### 06 Genetic CoAncestry - fineRADstructure
-Run on Linux, Graph in R.
+
+### 06 Genetic Co-ancestry - fineRADstructure
+Genetic co-ancestry among all lineages was assessed with fineRADstructure in Linux using the multiple-snp datasets produced by STACKS. The results of the fineRADstructure analyses were visualized using scripts modified from the original program. Plots are stored in a seperate folder due to size issues with R consule. fineRADstructure linux commands are included in script: 06_Genetic_Coancestry_Linux_Commands.sh
 
 ```{r 06_Genetic_Coancestry_Analysis, echo=TRUE, results = 'hide'}
 ### 1) EDIT THE PATH TO YOUR COPY of FinestructureLibrary.R
@@ -341,11 +377,23 @@ plotsFolder <- "06_Genetic_CoAncestry/RADpainter_R_Plots/"
 Dut.chunkfile<-"06_Genetic_CoAncestry/Duttoniana_min_max_1pop_Multi.haps_chunks.out" ## RADpainter output file
 Dut.mcmcfile<-"06_Genetic_CoAncestry/Duttoniana_min_max_1pop_Multi.haps_chunks.mcmc.xml" ## finestructure mcmc file
 Dut.treefile<-"06_Genetic_CoAncestry/Duttoniana_min_max_1pop_Multi.haps_chunks.mcmcTree.xml" ## finestructure tree file
-### 4) SET VALUES FOR THESE VARIABLES: "analysisName" will be included in output plots
 Dut.analysisName <- "Duttoniana_Genetic_CoAncestry";  maxIndv <- 1000; maxPop<-1000
 
+#### Lithasia fuliginosa
+Ful.chunkfile<-"06_Genetic_CoAncestry/Duttoniana_min_max_1pop_Multi.haps_chunks.out" ## RADpainter output file
+Ful.mcmcfile<-"06_Genetic_CoAncestry/Duttoniana_min_max_1pop_Multi.haps_chunks.mcmc.xml" ## finestructure mcmc file
+Ful.treefile<-"06_Genetic_CoAncestry/Duttoniana_min_max_1pop_Multi.haps_chunks.mcmcTree.xml" ## finestructure tree file
+Ful.analysisName <- "Duttoniana_Genetic_CoAncestry";  maxIndv <- 1000; maxPop<-1000
+
+#### Lithasia geniculata
+Gent.chunkfile<-"06_Genetic_CoAncestry/Duttoniana_min_max_1pop_Multi.haps_chunks.out" ## RADpainter output file
+Gent.mcmcfile<-"06_Genetic_CoAncestry/Duttoniana_min_max_1pop_Multi.haps_chunks.mcmc.xml" ## finestructure mcmc file
+Gent.treefile<-"06_Genetic_CoAncestry/Duttoniana_min_max_1pop_Multi.haps_chunks.mcmcTree.xml" ## finestructure tree file
+Gent.analysisName <- "Duttoniana_Genetic_CoAncestry";  maxIndv <- 1000; maxPop<-1000
+
+### Create a function to visualize fineRADstructure outputs.
 fineRADstructure <- function(chunkfile,mcmcfile,treefile,analysisName){
-### 5) EXECUTE THE CODE ABOVE AND THE REST OF THE CODE BELOW
+### 4) EXECUTE THE CODE ABOVE AND THE REST OF THE CODE BELOW
 ## make some colours
 some.colors<-MakeColorYRP() # these are yellow-red-purple
 some.colorsEnd<-MakeColorYRP(final=c(0.2,0.2,0.2)) # as above, but with a dark grey final for capped values
@@ -387,7 +435,15 @@ pdf(file=paste(plotsFolder,analysisName,"-SimpleCoancestry.pdf",sep=""),height=2
 plotFinestructure(tmpmat,dimnames(tmpmat)[[1]],dend=tdend,cols=some.colorsEnd,cex.axis=1.1,edgePar=list(p.lwd=0,t.srt=90,t.off=-0.1,t.cex=1.2))
 dev.off()
 }
+```
 
+```{r 06_Genetic_CoAncestry Part 2, echo=TRUE}
+# Run fineRADstructure function to visualize outputs
 Dutt.fine <- fineRADstructure(Dut.chunkfile,Dut.mcmcfile,Dut.treefile,Dut.analysisName)
+Ful.fine <- fineRADstructure(Ful.chunkfile,Ful.mcmcfile,Ful.treefile,Ful.analysisName)
+Ful.fine <- fineRADstructure(Gent.chunkfile,Gent.mcmcfile,Gent.treefile,Gent.analysisName)
+
+# Check for PDF files in Folder
+list.files("06_Genetic_CoAncestry/RADpainter_R_Plots/")
 ```
 
