@@ -16,10 +16,100 @@ Raw reads were demultiplexed and filtered using *process_radtags* in Stacks 2.66
 A complete dataset, including all three species from the Duck River, using multiple single-nucleotide polymorphisms (SNPs) per locus was created for analyses that do not require unlinked loci. A complete dataset with only a single SNP per locus retained was used for analyses that assume loci are unlinked. Multiple and single SNP per locus datasets were also generated for each distinct, lineage.
 
 ### 02 Genetic Diversity Estimates
-For each lineage, observed heterozygosity (Ho), expected heterozygosity (He), nucleotide diversity (π), and inbreeding coefficients (FIS) were calculated by *populations* using the lineage-specific multiple SNPs per locus datasets. FST was also calculated using the Weir and Cockerham (1984) method, implemented in the R package HIERFSTAT (Goudet, 2005), to allow for comparisons among values calculated in other studies. 
+For each lineage, observed heterozygosity (Ho), expected heterozygosity (He), nucleotide diversity (π), and inbreeding coefficients (FIS) were calculated by *populations* using the lineage-specific multiple SNPs per locus datasets. 
 
-```{r}
+```{r 02_Genetic_Estimates, echo=TRUE}
+# Load Data from the Multiple SNPS Sumstats_Summary File produced by Stacks
+Dutt.sumstats <- read.table("02_Genetic_Diversity_Estimates/Duttoniana_min_max_1pop_Multi.sumstats_summary.tsv", header = TRUE, na.strings = "NA")
+Ful.sumstats <- read.table("02_Genetic_Diversity_Estimates/Fuliginosa_min_max_DAPC_4pops_Multi.sumstats_summary.tsv", header = TRUE, na.strings = "NA")
+Gent.sumstats <- read.table("02_Genetic_Diversity_Estimates/Geniculata_min_max_NBA_2pop_Multi.sumstats_summary.tsv", header = TRUE, na.strings = "NA")
+```
 
+#### 02 Genetic Diversity Estimates - *Lithasia duttoniana*
+```{r r 02_Genetic_Estimates Lithasia duttoniana, echo=TRUE}
+# Split by Population
+Dutt.sumstats$Pop_ID<-factor(Dutt.sumstats$Pop_ID, levels=unique(Dutt.sumstats$Pop_ID))
+Dutt.sumstats_list<-split(Dutt.sumstats,Dutt.sumstats$Pop_ID)
+
+#Calculate Averages for each Population
+Dutt.stats_table=data.frame()
+for (i in Dutt.sumstats_list){
+  pop_data<-as.data.frame(i)
+  pop<-pop_data$Pop_ID
+  Ho<-round(mean(pop_data[,9]),digits=4)
+  Ho_SE<-round((pop_data[,11]),digits=5)
+  He<-round(mean(pop_data[,15]),digits=4)
+  He_SE<-round((pop_data[,16]),digits=5)
+  Pi<-round(mean(pop_data[,21]),digits=4)
+  Pi_SE<-round((pop_data[,22]),digits=5)
+  Fis<-round(mean(pop_data[,24]),digits=4)
+  Fis_SE<-round((pop_data[,25]),digits=5)
+  Dutt.stats_table<-rbind(Dutt.stats_table,list(pop,Ho,Ho_SE,He,He_SE,Pi,Pi_SE,Fis,Fis_SE))
+}
+
+# Rename Columns
+names(Dutt.stats_table)<-c("Population","Ho","Ho_SE","He","He_SE","Pi","Pi_SE","Fis","Fis_SE")
+
+# View Table
+Dutt.stats_table
+```
+
+#### 02 Genetic Diversity Estimates - *Lithasia fuliginosa*
+```{r 02_Genetic_Estimates Lithasia fuliginosa, echo=TRUE}
+# Split by Population
+Ful.sumstats$Pop_ID<-factor(Ful.sumstats$Pop_ID, levels=unique(Ful.sumstats$Pop_ID))
+Ful.sumstats_list<-split(Ful.sumstats,Ful.sumstats$Pop_ID)
+
+#Calculate Averages for each Population
+Ful.stats_table=data.frame()
+for (i in Ful.sumstats_list){
+  pop_data<-as.data.frame(i)
+  pop<-pop_data$Pop_ID
+  Ho<-round(mean(pop_data[,9]),digits=4)
+  Ho_SE<-round((pop_data[,11]),digits=5)
+  He<-round(mean(pop_data[,15]),digits=4)
+  He_SE<-round((pop_data[,16]),digits=5)
+  Pi<-round(mean(pop_data[,21]),digits=4)
+  Pi_SE<-round((pop_data[,22]),digits=5)
+  Fis<-round(mean(pop_data[,24]),digits=4)
+  Fis_SE<-round((pop_data[,25]),digits=5)
+  Ful.stats_table<-rbind(Ful.stats_table,list(pop,Ho,Ho_SE,He,He_SE,Pi,Pi_SE,Fis,Fis_SE))
+}
+
+# Rename Columns
+names(Ful.stats_table)<-c("Population","Ho","Ho_SE","He","He_SE","Pi","Pi_SE","Fis","Fis_SE")
+
+# View Table
+Ful.stats_table
+```
+
+#### 02 Genetic Diversity Estimates - *Lithasia geniculata*
+```{r 02_Genetic_Estimates Lithasia geniculata, echo=TRUE}
+# Split by Population
+Gent.sumstats$Pop_ID<-factor(Gent.sumstats$Pop_ID, levels=unique(Gent.sumstats$Pop_ID))
+Gent.sumstats_list<-split(Gent.sumstats,Gent.sumstats$Pop_ID)
+
+#Calculate Averages for each Population
+Gent.stats_table=data.frame()
+for (i in Gent.sumstats_list){
+  pop_data<-as.data.frame(i)
+  pop<-pop_data$Pop_ID
+  Ho<-round(mean(pop_data[,9]),digits=4)
+  Ho_SE<-round((pop_data[,11]),digits=5)
+  He<-round(mean(pop_data[,15]),digits=4)
+  He_SE<-round((pop_data[,16]),digits=5)
+  Pi<-round(mean(pop_data[,21]),digits=4)
+  Pi_SE<-round((pop_data[,22]),digits=5)
+  Fis<-round(mean(pop_data[,24]),digits=4)
+  Fis_SE<-round((pop_data[,25]),digits=5)
+  Gent.stats_table<-rbind(Gent.stats_table,list(pop,Ho,Ho_SE,He,He_SE,Pi,Pi_SE,Fis,Fis_SE))
+}
+
+# Rename Columns
+names(Gent.stats_table)<-c("Population","Ho","Ho_SE","He","He_SE","Pi","Pi_SE","Fis","Fis_SE")
+
+# View Table
+Gent.stats_table
 ```
 
 ### 03 Population Structure Analyses - AMOVA
@@ -48,7 +138,7 @@ amova.pop = poppr.amova(genclone, ~geneid.pop, cutoff = 0.5, method = "ade4")
 }
 ```
 
-### 03 Population Structure Analysis - AMOVA - *Lithasia fuliginosa*
+#### 03 Population Structure Analysis - AMOVA - *Lithasia fuliginosa*
 ```{r 03_AMOVA_Analysis_L_fuliginosa, echo=TRUE}
 # Lithasia geniculata AMOVA
 Ful.amova <- Amova.Poppr(Ful.geneid)
@@ -56,7 +146,7 @@ Ful.amova <- Amova.Poppr(Ful.geneid)
 Ful.amova
 ```
 
-### 03 Population Structure Analysis - AMOVA - *Lithasia geniculata*
+#### 03 Population Structure Analysis - AMOVA - *Lithasia geniculata*
 ```{r 03_AMOVA_Analysis_L_geniculata, echo=TRUE}
 # Lithasia geniculata AMOVA
 Gent.amova <- Amova.Poppr(Gent.geneid)
