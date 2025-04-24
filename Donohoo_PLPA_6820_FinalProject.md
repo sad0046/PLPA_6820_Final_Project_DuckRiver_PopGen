@@ -1,36 +1,42 @@
----
-title: "PLPA 6820 Final Project"
-author: "SA Donohoo"
-date: "2025-04-24"
-output:
-  md_document:
-    variant: gfm
-  html_document:
-    toc_float: true
-  word_document:
-    toc: true
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE)
-```
 ### 01 Linux Scripts
-This folder contains bash scripts and programs used in Linux for data processing. 
 
-Raw reads were demultiplexed and filtered using *process_radtags* in Stacks 2.66 (Rochette et al., 2019) and the 01_Clone_Filtering.sh script. Demultiplexed reads were processed and assembled using the *denovo_map.pl* pipeline in Stacks. Parameters were determined following Paris et al. (2017). Assembled 3RAD loci were filtered using *populations* within Stacks.
+This folder contains bash scripts and programs used in Linux for data
+processing.
 
-A complete dataset, including all three species from the Duck River, using multiple single-nucleotide polymorphisms (SNPs) per locus was created for analyses that do not require unlinked loci. A complete dataset with only a single SNP per locus retained was used for analyses that assume loci are unlinked. Multiple and single SNP per locus datasets were also generated for each distinct, lineage.
+Raw reads were demultiplexed and filtered using *process_radtags* in
+Stacks 2.66 (Rochette et al., 2019) and the 01_Clone_Filtering.sh
+script. Demultiplexed reads were processed and assembled using the
+*denovo_map.pl* pipeline in Stacks. Parameters were determined following
+Paris et al. (2017). Assembled 3RAD loci were filtered using
+*populations* within Stacks.
 
-```{r 01_Linux, echo=TRUE}
+A complete dataset, including all three species from the Duck River,
+using multiple single-nucleotide polymorphisms (SNPs) per locus was
+created for analyses that do not require unlinked loci. A complete
+dataset with only a single SNP per locus retained was used for analyses
+that assume loci are unlinked. Multiple and single SNP per locus
+datasets were also generated for each distinct, lineage.
+
+``` r
 # Check for Scripts in Folder
 list.files("01_Linux_Scripts/")
 ```
 
+    ## [1] "01.1_Process_Radtags.sh"                        
+    ## [2] "01.2_Clone_Filtering.sh"                        
+    ## [3] "01.3_Paris_etal_2017_Parameter_Testing.sh"      
+    ## [4] "01.4_Denovo_Pipeline_plus_Populations.sh"       
+    ## [5] "DuckRiver_Paris_etal_2017_Parameter_Testing.csv"
+    ## [6] "Illumina_Barcodes"
 
 ### 02 Genetic Diversity Estimates
-For each lineage, observed heterozygosity (Ho), expected heterozygosity (He), nucleotide diversity (π), and inbreeding coefficients (FIS) were calculated by *populations* using the lineage-specific multiple SNPs per locus datasets. 
 
-```{r 02_Genetic_Estimates, echo=TRUE}
+For each lineage, observed heterozygosity (Ho), expected heterozygosity
+(He), nucleotide diversity (π), and inbreeding coefficients (FIS) were
+calculated by *populations* using the lineage-specific multiple SNPs per
+locus datasets.
+
+``` r
 # Load Data from the Multiple SNPS Sumstats_Summary File produced by Stacks
 Dutt.sumstats <- read.table("02_Genetic_Diversity_Estimates/Duttoniana_min_max_1pop_Multi.sumstats_summary.tsv", header = TRUE, na.strings = "NA")
 Ful.sumstats <- read.table("02_Genetic_Diversity_Estimates/Fuliginosa_min_max_DAPC_4pops_Multi.sumstats_summary.tsv", header = TRUE, na.strings = "NA")
@@ -38,7 +44,8 @@ Gent.sumstats <- read.table("02_Genetic_Diversity_Estimates/Geniculata_min_max_N
 ```
 
 #### 02 Genetic Diversity Estimates - *Lithasia duttoniana*
-```{r r 02_Genetic_Estimates Lithasia duttoniana, echo=TRUE}
+
+``` r
 # Split by Population
 Dutt.sumstats$Pop_ID<-factor(Dutt.sumstats$Pop_ID, levels=unique(Dutt.sumstats$Pop_ID))
 Dutt.sumstats_list<-split(Dutt.sumstats,Dutt.sumstats$Pop_ID)
@@ -66,8 +73,12 @@ names(Dutt.stats_table)<-c("Population","Ho","Ho_SE","He","He_SE","Pi","Pi_SE","
 Dutt.stats_table
 ```
 
+    ##   Population     Ho   Ho_SE     He   He_SE    Pi   Pi_SE    Fis  Fis_SE
+    ## 1  LduttDuck 0.1912 0.00083 0.2217 0.02187 0.223 0.02213 0.1311 0.04008
+
 #### 02 Genetic Diversity Estimates - *Lithasia fuliginosa*
-```{r 02_Genetic_Estimates Lithasia fuliginosa, echo=TRUE}
+
+``` r
 # Split by Population
 Ful.sumstats$Pop_ID<-factor(Ful.sumstats$Pop_ID, levels=unique(Ful.sumstats$Pop_ID))
 Ful.sumstats_list<-split(Ful.sumstats,Ful.sumstats$Pop_ID)
@@ -95,8 +106,15 @@ names(Ful.stats_table)<-c("Population","Ho","Ho_SE","He","He_SE","Pi","Pi_SE","F
 Ful.stats_table
 ```
 
+    ##   Population     Ho   Ho_SE     He   He_SE     Pi   Pi_SE    Fis  Fis_SE
+    ## 1          A 0.1994 0.00106 0.2097 0.02981 0.2144 0.03115 0.0465 0.04218
+    ## 2          B 0.2049 0.00097 0.2160 0.03095 0.2202 0.03219 0.0477 0.04042
+    ## 3          C 0.2080 0.00110 0.2225 0.02810 0.2243 0.02854 0.0565 0.02716
+    ## 4          D 0.2184 0.00084 0.2406 0.02406 0.2417 0.02427 0.0848 0.02595
+
 #### 02 Genetic Diversity Estimates - *Lithasia geniculata*
-```{r 02_Genetic_Estimates Lithasia geniculata, echo=TRUE}
+
+``` r
 # Split by Population
 Gent.sumstats$Pop_ID<-factor(Gent.sumstats$Pop_ID, levels=unique(Gent.sumstats$Pop_ID))
 Gent.sumstats_list<-split(Gent.sumstats,Gent.sumstats$Pop_ID)
@@ -124,17 +142,48 @@ names(Gent.stats_table)<-c("Population","Ho","Ho_SE","He","He_SE","Pi","Pi_SE","
 Gent.stats_table
 ```
 
-### 03 Population Structure Analyses - AMOVA
-An analysis of molecular variance (AMOVA; Excoffier et al., 1992) was conducted using the multiple SNPs per locus dataset for *Lithasia fuliginosa* and *Lithasia geniculata* to test for population structure among collection sites. Using the poppr.amova function in the R package ADEGENET (Jombart, 2008; Kamvar et al., 2014), individuals were stratified by collection site.
+    ##   Population     Ho   Ho_SE     He   He_SE     Pi   Pi_SE    Fis  Fis_SE
+    ## 1        Low 0.1982 0.00062 0.2206 0.02296 0.2219 0.02324 0.0953 0.03520
+    ## 2      Upper 0.1975 0.00085 0.2138 0.02371 0.2148 0.02394 0.0688 0.02655
 
-```{r 03_AMOVA_Analysis, echo=TRUE}
+### 03 Population Structure Analyses - AMOVA
+
+An analysis of molecular variance (AMOVA; Excoffier et al., 1992) was
+conducted using the multiple SNPs per locus dataset for *Lithasia
+fuliginosa* and *Lithasia geniculata* to test for population structure
+among collection sites. Using the poppr.amova function in the R package
+ADEGENET (Jombart, 2008; Kamvar et al., 2014), individuals were
+stratified by collection site.
+
+``` r
 # Load packages
 library(poppr)
 
 # Load Data from Multiple HAPS Genepop File produced by Stacks
 Ful.geneid = read.genepop("03_Population_Structure_AMOVA/Fuliginosa_min_max_DAPC_4pops_Multi.haps.gen")
-Gent.geneid = read.genepop("03_Population_Structure_AMOVA/Geniculata_min_max_NBA_2pop_Multi.haps.gen")
+```
 
+    ## 
+    ##  Converting data from a Genepop .gen file to a genind object... 
+    ## 
+    ## 
+    ## File description:  Stacks v2.68; GenePop v4.1.3; April 23, 2025 
+    ## 
+    ## ...done.
+
+``` r
+Gent.geneid = read.genepop("03_Population_Structure_AMOVA/Geniculata_min_max_NBA_2pop_Multi.haps.gen")
+```
+
+    ## 
+    ##  Converting data from a Genepop .gen file to a genind object... 
+    ## 
+    ## 
+    ## File description:  Stacks v2.68; GenePop v4.1.3; April 22, 2025 
+    ## 
+    ## ...done.
+
+``` r
 # Create a function that conducts an AMOVA using Poppr
 Amova.Poppr <- function(geneid){
 
@@ -151,25 +200,80 @@ amova.pop = poppr.amova(genclone, ~geneid.pop, cutoff = 0.5, method = "ade4")
 ```
 
 #### 03 Population Structure Analysis - AMOVA - *Lithasia fuliginosa*
-```{r 03_AMOVA_Analysis_L_fuliginosa, echo=TRUE}
+
+``` r
 # Lithasia geniculata AMOVA
 Ful.amova <- Amova.Poppr(Ful.geneid)
 # View AMOVA Results
 Ful.amova
 ```
 
+    ## $call
+    ## ade4::amova(samples = xtab, distances = xdist, structures = xstruct)
+    ## 
+    ## $results
+    ##                                    Df    Sum Sq   Mean Sq
+    ## Between geneid.pop                  3  106926.7 35642.250
+    ## Between samples Within geneid.pop 251  842569.7  3356.851
+    ## Within samples                    255  741784.4  2908.958
+    ## Total                             509 1691280.8  3322.752
+    ## 
+    ## $componentsofcovariance
+    ##                                                   Sigma          %
+    ## Variations  Between geneid.pop                 296.6838   8.650710
+    ## Variations  Between samples Within geneid.pop  223.9464   6.529833
+    ## Variations  Within samples                    2908.9585  84.819457
+    ## Total variations                              3429.5886 100.000000
+    ## 
+    ## $statphi
+    ##                               Phi
+    ## Phi-samples-total      0.15180543
+    ## Phi-samples-geneid.pop 0.07148204
+    ## Phi-geneid.pop-total   0.08650710
+
 #### 03 Population Structure Analysis - AMOVA - *Lithasia geniculata*
-```{r 03_AMOVA_Analysis_L_geniculata, echo=TRUE}
+
+``` r
 # Lithasia geniculata AMOVA
 Gent.amova <- Amova.Poppr(Gent.geneid)
 # View AMOVA Results
 Gent.amova
 ```
 
-### 04 Population Structure Analyses - DAPC
-Discriminant analysis of principal components was conducted in the R package ADEGENET using the multi-species multiple-snp dataset produced by STACKS. The best-fit number of genetic clusters (K) was determined using K-means clustering and Bayesian information criteria (Supporting Information); however, the number of principal component (PC) axes used in the DAPC analysis followed Patterson, Price, and Reich (2006) K - 1 rule.
+    ## $call
+    ## ade4::amova(samples = xtab, distances = xdist, structures = xstruct)
+    ## 
+    ## $results
+    ##                                    Df     Sum Sq   Mean Sq
+    ## Between geneid.pop                  1   37897.23 37897.230
+    ## Between samples Within geneid.pop 208  638964.06  3071.943
+    ## Within samples                    210  560100.41  2667.145
+    ## Total                             419 1236961.69  2952.176
+    ## 
+    ## $componentsofcovariance
+    ##                                                   Sigma          %
+    ## Variations  Between geneid.pop                 167.6749   5.520674
+    ## Variations  Between samples Within geneid.pop  202.3989   6.663955
+    ## Variations  Within samples                    2667.1448  87.815371
+    ## Total variations                              3037.2186 100.000000
+    ## 
+    ## $statphi
+    ##                               Phi
+    ## Phi-samples-total      0.12184629
+    ## Phi-samples-geneid.pop 0.07053348
+    ## Phi-geneid.pop-total   0.05520674
 
-``` {r 04_DAPC_Analysis, echo=TRUE}
+### 04 Population Structure Analyses - DAPC
+
+Discriminant analysis of principal components was conducted in the R
+package ADEGENET using the multi-species multiple-snp dataset produced
+by STACKS. The best-fit number of genetic clusters (K) was determined
+using K-means clustering and Bayesian information criteria (Supporting
+Information); however, the number of principal component (PC) axes used
+in the DAPC analysis followed Patterson, Price, and Reich (2006) K - 1
+rule.
+
+``` r
 # Load packages
 library(adegenet)
 library(ape)
@@ -178,7 +282,17 @@ library(na.tools)
 
 # Load Lithasia.data from Multiple SNP Genepop File produced by Stacks
 Lithasia.data <- read.genepop(file="04_Population_Structure_DAPC/Lithasia_Duck_min_max_NBA_NoOut_DAPC3.snps.gen")
+```
 
+    ## 
+    ##  Converting data from a Genepop .gen file to a genind object... 
+    ## 
+    ## 
+    ## File description:  # Stacks v2.68; GenePop v4.1.3; April 17, 2025 
+    ## 
+    ## ...done.
+
+``` r
 # Find the Best-Fit # of Principle Components (Genetic Clusters)
 grp <- find.clusters(Lithasia.data, max.n.clust=30, n.pca = 500, n.clust = 7)
 
@@ -197,11 +311,16 @@ scatter(dapc2, scree.da=FALSE, bg="white", pch=20, cell=0,
         cstar=0, col=cbbPalette, solid=.4, cex=3,clab=0, leg=TRUE, posi.leg = "bottomright")
 ```
 
+![](Donohoo_PLPA_6820_FinalProject_files/figure-gfm/04_DAPC_Analysis-1.png)<!-- -->
+
 ### 05 Population Structure Analyses - LEA Admixture
-Genetic admixture among all lineages was assessed with the snmf function in the R package LEA (Frichot & François, 2015) using the single-snp datasets produced by STACKS because the *snmf* method assumes that SNPs are unlinked.
 
-```{r 05_LEA_Admixture_Analysis, echo=TRUE, results = 'hide'}
+Genetic admixture among all lineages was assessed with the snmf function
+in the R package LEA (Frichot & François, 2015) using the single-snp
+datasets produced by STACKS because the *snmf* method assumes that SNPs
+are unlinked.
 
+``` r
 # Load Packages
 library(LEA)
 library(BiocManager)
@@ -232,13 +351,13 @@ Admixture.Lea.K.qmatrix <- function(Input.File, Kvalue){
 
 #### *Lithasia duttoniana* Admixture Analysis
 
-```{r 05_LEA_Admixture_Analysis L. duttoniana, echo=TRUE, results = 'hide'}
+``` r
 # Run LEA Admixture for Lithasia duttoniana in the Duck River, TN.
 # Best fit K-value is 2.
 Dutt.qmatrix.K2 <- Admixture.Lea.K.qmatrix(Dutt.input.file, 2)
 ```
 
-```{r 05_LEA_Admixture_Analysis L. duttoniana P2, echo=TRUE}
+``` r
 # Convert Vector into DataFrame
 Dutt.qmatrix.K2 <- data.frame(Dutt.qmatrix.K2)
 
@@ -301,20 +420,17 @@ Dutt.admixture <- ggplot(Dutt.LEA.K2.Long, aes(x = factor(Specimen), y = Amount,
 
 #### Results of LEA Admixture Analysis for *Lithasia duttoniana*
 
-```{r 05_LEA_Admixture_Analysis L. duttoniana P3, echo=FALSE}
-# View Admixture Graph
-Dutt.admixture
-```
+![](Donohoo_PLPA_6820_FinalProject_files/figure-gfm/05_LEA_Admixture_Analysis%20L.%20duttoniana%20P3-1.png)<!-- -->
 
 #### *Lithasia fuliginosa* Admixture Analysis
 
-```{r 05_LEA_Admixture_Analysis L. fuliginosa, echo=TRUE, results = 'hide'}
+``` r
 # Run LEA Admixture for Lithasia fuliginosa in the Duck River, TN.
 # Best fit K-value is 2.
 Ful.qmatrix.K4 <- Admixture.Lea.K.qmatrix(Ful.input.file, 4)
 ```
 
-```{r 05_LEA_Admixture_Analysis L. fuliginosa P2, echo=TRUE}
+``` r
 # Convert Vector into DataFrame
 Ful.qmatrix.K4 <- data.frame(Ful.qmatrix.K4)
 
@@ -377,20 +493,17 @@ Ful.admixture <- ggplot(Ful.LEA.K4.Long, aes(x = factor(Specimen), y = Amount, f
 
 #### Results of LEA Admixture Analysis for *Lithasia fuliginosa*
 
-```{r 05_LEA_Admixture_Analysis L. fuliginosa Part 3, echo=FALSE}
-# View Admixture Graph
-Ful.admixture
-```
+![](Donohoo_PLPA_6820_FinalProject_files/figure-gfm/05_LEA_Admixture_Analysis%20L.%20fuliginosa%20Part%203-1.png)<!-- -->
 
 #### *Lithasia geniculata* Admixture Analysis
 
-```{r 05_LEA_Admixture_Analysis L. geniculata, echo=TRUE, results = 'hide'}
+``` r
 # Run LEA Admixture for Lithasia fuliginosa in the Duck River, TN.
 # Best fit K-value is 3.
 Gent.qmatrix.K2 <- Admixture.Lea.K.qmatrix(Gent.input.file, 2)
 ```
 
-```{r 05_LEA_Admixture_Analysis L. geniculata P2, echo=TRUE}
+``` r
 # Convert Vector into DataFrame
 Gent.qmatrix.K2 <- data.frame(Gent.qmatrix.K2)
 
@@ -449,15 +562,19 @@ Gent.admixture <- ggplot(Gent.LEA.K2.Long, aes(x = factor(Specimen), y = Amount,
 
 #### Results of LEA Admixture Analysis for *Lithasia geniculata*
 
-```{r 05_LEA_Admixture_Analysis L. geniculata Part 3, echo=FALSE}
-# View Admixture Graph
-Gent.admixture
-```
+![](Donohoo_PLPA_6820_FinalProject_files/figure-gfm/05_LEA_Admixture_Analysis%20L.%20geniculata%20Part%203-1.png)<!-- -->
 
 ### 06 Genetic Co-ancestry - fineRADstructure
-Genetic co-ancestry among all lineages was assessed with fineRADstructure in Linux using the multiple-snp datasets produced by STACKS. The results of the fineRADstructure analyses were visualized using scripts modified from the original program. Plots are stored in a seperate folder due to size issues with R consule. fineRADstructure linux commands are included in script: 06_Genetic_Coancestry_Linux_Commands.sh
 
-```{r 06_Genetic_Coancestry_Analysis, echo=TRUE, results = 'hide'}
+Genetic co-ancestry among all lineages was assessed with
+fineRADstructure in Linux using the multiple-snp datasets produced by
+STACKS. The results of the fineRADstructure analyses were visualized
+using scripts modified from the original program. Plots are stored in a
+seperate folder due to size issues with R consule. fineRADstructure
+linux commands are included in script:
+06_Genetic_Coancestry_Linux_Commands.sh
+
+``` r
 ### 1) EDIT THE PATH TO YOUR COPY of FinestructureLibrary.R
 source("06_Genetic_CoAncestry/FinestructureLibrary.R", chdir = TRUE) # read in the R functions, which also calls the needed packages
 
@@ -485,7 +602,7 @@ Gent.treefile<-"06_Genetic_CoAncestry/Geniculata_min_max_NBA_2pop_Multi.haps_chu
 Gent.analysisName <- "Lithasia_geniculata_Genetic_CoAncestry";  maxIndv <- 1000; maxPop<-1000
 ```
 
-```{r 06_Genetic_Coancestry_Analysis P2, echo=TRUE}
+``` r
 ### Create a function to visualize fineRADstructure outputs.
 fineRADstructure <- function(chunkfile,mcmcfile,treefile,analysisName){
 ### 4) EXECUTE THE CODE ABOVE AND THE REST OF THE CODE BELOW
@@ -537,7 +654,7 @@ dev.off()
 }
 ```
 
-```{r 06_Genetic_CoAncestry P3, echo=TRUE}
+``` r
 # Run fineRADstructure function to visualize outputs
 Dutt.fine <- fineRADstructure(Dut.chunkfile,Dut.mcmcfile,Dut.treefile,Dut.analysisName)
 Ful.fine <- fineRADstructure(Ful.chunkfile,Ful.mcmcfile,Ful.treefile,Ful.analysisName)
@@ -547,3 +664,6 @@ Gent.fine <- fineRADstructure(Gent.chunkfile,Gent.mcmcfile,Gent.treefile,Gent.an
 list.files("06_Genetic_CoAncestry/RADpainter_R_Plots/")
 ```
 
+    ## [1] "Lithasia_duttoniana_Genetic_CoAncestry-SimpleCoancestry.pdf"
+    ## [2] "Lithasia_fuliginosa_Genetic_CoAncestry-SimpleCoancestry.pdf"
+    ## [3] "Lithasia_geniculata_Genetic_CoAncestry-SimpleCoancestry.pdf"
