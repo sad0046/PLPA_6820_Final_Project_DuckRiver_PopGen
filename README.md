@@ -54,13 +54,10 @@ Note: The files in the directory 01_Linux_Scripts/ are to be run on a Linux Serv
 ├── 05_Population_Structure_Admixture
 │   ├── 05_LEA_Admixture_Script.R
 │   ├── Duttoniana_Metadata.csv
-│   ├── Duttoniana_min_max_NBA_Single.snps.geno
 │   ├── Duttoniana_min_max_NBA_Single.snps.vcf
 │   ├── Fuliginosa_Metadata.csv
-│   ├── Fuliginosa_min_max_DAPC_4pops_Single.snps.geno
 │   ├── Fuliginosa_min_max_DAPC_4pops_Single.snps.vcf
 │   ├── Geniculata_Metadata.csv
-│   ├── Geniculata_min_max_2Pops_NBA_Single.snps.geno
 │   └── Geniculata_min_max_2Pops_NBA_Single.snps.vcf
 ├── 06_Genetic_CoAncestry
 │   ├── 06_Genetic_Coancestry_Linux_Commands.sh
