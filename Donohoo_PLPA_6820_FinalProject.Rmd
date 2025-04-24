@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE)
 ### 01 Linux Scripts
 This folder contains bash scripts and programs used in Linux for data processing. 
 
-Raw reads were demultiplexed and filtered using *process_radtags* in Stacks 2.66 (Rochette et al., 2019). Demultiplexed reads were processed and assembled using the *denovo_map.pl* pipeline in Stacks. Parameters were determined following Paris et al. (2017). Assembled 3RAD loci were filtered using *populations* within Stacks.
+Raw reads were demultiplexed and filtered using *process_radtags* in Stacks 2.66 (Rochette et al., 2019) and the 01_Clone_Filtering.sh script. Demultiplexed reads were processed and assembled using the *denovo_map.pl* pipeline in Stacks. Parameters were determined following Paris et al. (2017). Assembled 3RAD loci were filtered using *populations* within Stacks.
 
 A complete dataset, including all three species from the Duck River, using multiple single-nucleotide polymorphisms (SNPs) per locus was created for analyses that do not require unlinked loci. A complete dataset with only a single SNP per locus retained was used for analyses that assume loci are unlinked. Multiple and single SNP per locus datasets were also generated for each distinct, lineage.
 
