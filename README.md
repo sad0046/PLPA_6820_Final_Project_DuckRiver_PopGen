@@ -16,7 +16,7 @@ Note: The files in the directory 01_Linux_Scripts/ are to be run on a Linux Serv
 
 #### Link to the R Markdown viewable on Github (.md)
 
-*[DuckRiver RMarkdown]
+*[DuckRiver RMarkdown](https://github.com/sad0046/PLPA_6820_Final_Project_DuckRiver_PopGen/blob/main/README.md)
 
 #### File Tree
 
