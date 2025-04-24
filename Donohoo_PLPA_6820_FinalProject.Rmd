@@ -1,8 +1,14 @@
 ---
 title: "PLPA 6820 Final Project"
 author: "SA Donohoo"
-date: "2025-04-18"
-output: html_document
+date: "2025-04-24"
+output:
+  word_document:
+    toc: true
+  html_document:
+    toc_float: true
+  md_document:
+    variant: gfm
 ---
 
 ```{r setup, include=FALSE}
@@ -14,6 +20,12 @@ This folder contains bash scripts and programs used in Linux for data processing
 Raw reads were demultiplexed and filtered using *process_radtags* in Stacks 2.66 (Rochette et al., 2019). Demultiplexed reads were processed and assembled using the *denovo_map.pl* pipeline in Stacks. Parameters were determined following Paris et al. (2017). Assembled 3RAD loci were filtered using *populations* within Stacks.
 
 A complete dataset, including all three species from the Duck River, using multiple single-nucleotide polymorphisms (SNPs) per locus was created for analyses that do not require unlinked loci. A complete dataset with only a single SNP per locus retained was used for analyses that assume loci are unlinked. Multiple and single SNP per locus datasets were also generated for each distinct, lineage.
+
+```{r 01_Linux, echo=TRUE}
+# Check for Scripts in Folder
+list.files("01_Linux_Scripts/")
+```
+
 
 ### 02 Genetic Diversity Estimates
 For each lineage, observed heterozygosity (Ho), expected heterozygosity (He), nucleotide diversity (π), and inbreeding coefficients (FIS) were calculated by *populations* using the lineage-specific multiple SNPs per locus datasets. 
@@ -195,8 +207,6 @@ library(LEA)
 library(BiocManager)
 library(ggplot2)
 library(tidyverse)
-library(ggpubr)
-library(ggrepel)
 
 # Load data from Single SNP VCF produced by Stacks
 Dutt.input.file <- "05_Population_Structure_Admixture/Duttoniana_min_max_NBA_Single.snps.vcf"

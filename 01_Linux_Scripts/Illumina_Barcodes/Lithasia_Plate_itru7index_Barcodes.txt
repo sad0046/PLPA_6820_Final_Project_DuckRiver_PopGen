@@ -1,0 +1,9 @@
+ACGTTACC	Lithasia_Jan_2025_Plate_1
+CTGTGTTG	Lithasia_Jan_2025_Plate_2
+TGAGGTGT	Lithasia_Jan_2025_Plate_3
+GATCCATG	Lithasia_Jan_2025_Plate_4
+GCCTATCA	Lithasia_Jan_2025_Plate_5
+AACAACCG	Lithasia_Jan_2025_Plate_6
+ACTCGTTG	Lithasia_Jan_2025_Plate_7
+CCTATGGT	Lithasia_Jan_2025_Plate_8
+TGTACACC	Lithasia_Jan_2025_Plate_9
